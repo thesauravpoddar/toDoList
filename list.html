@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Priorities</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"/>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 86%);
+      background-attachment: fixed; 
+      background-size: cover; 
+      min-height: 100vh; 
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .page {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .to-do-list-card {
+      background-color: black;
+      padding: 50px;
+      height: auto;
+      width: 500px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+      max-height: 90vh; 
+    }
+    
+    .heading,
+    .to-do-list-desp {
+      color: white;
+      font-family: "Bree Serif", serif;
+      animation: fadeIn 1s ease-in-out;
+    }
+    
+    .goals {
+      color: black;
+      border-radius: 20px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .form-check {
+      position: relative;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    .form-check-input {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      width: 1.7em;
+      height: 1.7em;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .form-check-input:checked {
+      transform: translateY(-50%) scale(1.3);
+      background-color: #6c757d;
+    }
+    
+    .form-control-goals {
+      padding-left: 45px;
+      border-radius: 20px;
+      width: 300px;
+      transition: transform 0.3s ease;
+    }
+    
+    .form-control-goals:focus {
+      border-color: #6c757d;
+      transform: scale(1.05);
+    }
+    
+    .btn-add-goal {
+      background-color: #6c757d;
+      color: white;
+      border-radius: 25px;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .btn-add-goal:hover {
+      background-color: #5a6268;
+    }
+    
+    .tasks-left {
+      color: white;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    
+    .progress {
+      margin-top: 20px;
+      height: 30px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      background-color: #6c757d;
+      transition: width 0.4s ease;
+    }
+    
+    .remove-btn {
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 5px 10px;
+      cursor: pointer;
+      position: absolute;
+      right: 5px;
+      top: 5px;
+    }
+
+    .cut-text {
+      text-decoration: line-through;
+      transition: text-decoration 0.3s ease-in-out;
+    }
+    
+    .form-control-goals {
+      transition: all 0.3s ease;
+    }
+    
+    .form-control-goals:disabled {
+      background-color: #f0f0f0;
+    }
+    
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateX(-50%); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+@keyframes crazyAnimation {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.crazy-move {
+  animation: crazyAnimation 0.5s ease-out;
+}
+
+
+.form-control-goals.dragging {
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+Ṇ
+.form-control-goals:focus {
+  transform: scale(1.05);
+}Ṇ
+.move-goal {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-top: 20px;
+  animation: fadeInText 2s ease-out;
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+    
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="to-do-list-card text-center">
+      <h1 class="heading">Focus Priorities</h1>
+      <p class="to-do-list-desp">Set your priorities for the day</p>
+      <p class="move-goal">You can move the goal bar anywhere you want!</p>
+      <div class="card-for-to-do-list">
+        <form id="toDoListForm">
+             <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="task1">
+                <input type="text" class="form-control goals form-control-goals" placeholder="Type your priority here" id="goal1">
+                <button type="button" class="remove-btn">X</button>
+             </div>
+             <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="task2">
+                <input type="text" class="form-control goals form-control-goals" placeholder="Type your priority here" id="goal2">
+                <button type="button" class="remove-btn">X</button>
+             </div>
+             <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="task3">
+                 <input type="text" class="form-control goals form-control-goals" placeholder="Type your priority here" id="goal3">
+                    <button 
+                    type="button" class="remove-btn">X
+                  </button>
+                 </div>
+          <div class="form-check">
+                         <input type="checkbox" class="form-check-input" id="task4">
+                       <input type="text" class="form-control goals form-control-goals" placeholder="Type your priority here" id="goal4">
+                 <button 
+                 type="button" class="remove-btn">X
+                </button>
+          </div>
+          <div class="form-check">
+                        <input 
+                        type="checkbox" class="form-check-input" id="task5">
+                     <input type="text" class="form-control goals form-control-goals" placeholder="Type your priority here" id="goal5">
+                 <button 
+                 type="button" class="remove-btn">X
+                </button>
+          </div>
+        </form>
+               <button 
+               class="btn-add-goal" id="addGoalBtn">Add New Goal
+              </button>
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="tasks-left" id="tasksLeft">5 tasks left</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const checkboxes = document.querySelectorAll('.form-check-input');
+      const tasksLeftText = document.getElementById('tasksLeft');
+      const progressBar = document.querySelector('.progress-bar');
+      const removeBtns = document.querySelectorAll('.remove-btn');
+      const inputs = document.querySelectorAll('.form-control-goals');
+      const goalList = document.getElementById('toDoListForm');
+    
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateTaskCount);
+      });
+    
+      removeBtns.forEach(button => {
+        button.addEventListener('click', removeTask);
+      });
+    
+      // Make each task draggable
+      const taskItems = document.querySelectorAll('.form-check');
+      taskItems.forEach(task => {
+        task.setAttribute('draggable', 'true');
+        
+        task.addEventListener('dragstart', dragStart);
+        task.addEventListener('dragover', dragOver);
+        task.addEventListener('drop', drop);
+        task.addEventListener('dragend', dragEnd);
+      });
+    
+      function dragStart(e) {
+        // Add a "crazy" animation when dragging
+        e.target.classList.add('crazy-move');
+        e.target.classList.add('dragging');
+        setTimeout(() => {
+          e.target.style.opacity = '0.5'; // Make it slightly transparent during drag
+        }, 0);
+      }
+    
+      function dragEnd(e) {
+        e.target.classList.remove('dragging', 'crazy-move');
+        e.target.style.opacity = '1';
+      }
+    
+      function dragOver(e) {
+        e.preventDefault();
+        const draggedItem = document.querySelector('.dragging');
+        const targetItem = e.target.closest('.form-check');
+        
+        if (targetItem && draggedItem !== targetItem) {
+          const rect = targetItem.getBoundingClientRect();
+          const offset = rect.top + rect.height / 2;
+          if (e.clientY < offset) {
+            goalList.insertBefore(draggedItem, targetItem);
+          } else {
+            goalList.insertBefore(draggedItem, targetItem.nextSibling);
+          }
+        }
+      }
+    
+      function drop(e) {
+        e.preventDefault();
+        const draggedItem = document.querySelector('.dragging');
+        draggedItem.classList.remove('dragging');
+        draggedItem.classList.add('crazy-move'); // Add crazy animation after drop
+        setTimeout(() => {
+          draggedItem.classList.remove('crazy-move');
+        }, 500); // Remove animation after 0.5s
+    
+        updateTaskCount(); // Recalculate progress and tasks left
+      }
+    
+      function updateTaskCount() {
+        const totalTasks = document.querySelectorAll('.form-check-input').length;
+        const checkedTasks = document.querySelectorAll('.form-check-input:checked').length;
+    
+        tasksLeftText.textContent = `${totalTasks - checkedTasks} tasks left`;
+    
+        const progressPercentage = (checkedTasks / totalTasks) * 100;
+        progressBar.style.width = `${progressPercentage}%`;
+        progressBar.setAttribute('aria-valuenow', progressPercentage);
+    
+        // Loop through each checkbox and toggle the cut-text class on the input field
+        checkboxes.forEach((checkbox, index) => {
+          const goalInput = document.querySelectorAll('.form-control-goals')[index];
+          if (checkbox.checked) {
+            goalInput.classList.add('cut-text');
+          } else {
+            goalInput.classList.remove('cut-text');
+          }
+        });
+      }
+    
+      function removeTask(event) {
+        const taskDiv = event.target.closest('.form-check');
+        taskDiv.remove();
+        updateTaskCount();
+      }
+    
+      // Prevent new tasks from being added until the current one is filled
+      inputs.forEach((input, index) => {
+        input.addEventListener('input', enableNextTask);
+        if (index > 0) {
+          input.disabled = true; // Disable input fields below the first one initially
+        }
+      });
+    
+      function enableNextTask(event) {
+        const index = Array.from(inputs).indexOf(event.target);
+        if (event.target.value.trim() !== "") {
+          if (inputs[index + 1]) {
+            inputs[index + 1].disabled = false;
+          }
+        } else {
+          if (inputs[index + 1]) {
+            inputs[index + 1].disabled = true;
+          }
+        }
+      }
+    
+      const addGoalBtn = document.getElementById('addGoalBtn');
+      addGoalBtn.addEventListener('click', addNewGoal);
+    
+      function addNewGoal() {
+        const newGoalDiv = document.createElement('div');
+        newGoalDiv.classList.add('form-check');
+        newGoalDiv.setAttribute('draggable', 'true');
+    
+        const newCheckbox = document.createElement('input');
+        newCheckbox.type = 'checkbox';
+        newCheckbox.classList.add('form-check-input');
+        newGoalDiv.appendChild(newCheckbox);
+    
+        const newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.classList.add('form-control', 'goals', 'form-control-goals');
+        newInput.placeholder = 'Type your priority here';
+        newGoalDiv.appendChild(newInput);
+    
+        const newRemoveBtn = document.createElement('button');
+        newRemoveBtn.type = 'button';
+        newRemoveBtn.classList.add('remove-btn');
+        newRemoveBtn.textContent = 'X';
+        newGoalDiv.appendChild(newRemoveBtn);
+    
+        document.getElementById('toDoListForm').appendChild(newGoalDiv);
+    
+        newCheckbox.addEventListener('change', updateTaskCount);
+        newRemoveBtn.addEventListener('click', removeTask);
+
+        const allInputs = document.querySelectorAll('.form-control-goals');
+        allInputs.forEach((input, index) => {
+          if (index > 0) input.disabled = true;
+        });
+    
+        
+        newGoalDiv.addEventListener('dragstart', dragStart);
+        newGoalDiv.addEventListener('dragover', dragOver);
+        newGoalDiv.addEventListener('drop', drop);
+        newGoalDiv.addEventListener('dragend', dragEnd);
+    
+        updateTaskCount();
+      }
+    });
+    
+    
+  </script>
+</body>
+</html>
